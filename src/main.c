@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
 	if(test_state == NULL){
 		exit(EXIT_FAILURE);
 	}
-	uint8_t* test_data = (uint8_t*) malloc(sizeof(uint8_t) * 5);
+	uint8_t* test_data = (uint8_t*) malloc(sizeof(uint8_t) * 4);
 	if(test_data == NULL){
 		exit(EXIT_FAILURE);
 	}
@@ -24,8 +24,7 @@ int main(int argc, char *argv[]) {
 	test_data[1] = 0x05;
 	test_data[2] = 0xFF;
 	test_data[3] = 0xA0;
-	test_data[4] = '\0';
-	if(load_program_instructions(test_state, test_data) == INSTR_LOAD_SUCCESS){
+	if(load_program_instructions(test_state, test_data, 4) == INSTR_LOAD_SUCCESS){
 		uint16_t instr = get_instruction_at_pc(test_state);
 		while(instr != INVALID_INSTR){
 			printf("0x%X\n", instr);

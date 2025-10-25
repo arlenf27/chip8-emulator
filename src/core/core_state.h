@@ -75,9 +75,8 @@ void delete_state(core_state* state);
 /**
  * @Precondition: 2-byte instructions MUST be valid instructions.
  * @Precondition: 2-byte instructions in bin_data are stored in big-endian.
- * @Precondition: bin_data is NULL-terminated.
  */
-instruction_load_status load_program_instructions(core_state* state, uint8_t* bin_data);
+instruction_load_status load_program_instructions(core_state* state, uint8_t* bin_data, size_t bin_data_size);
 
 uint16_t get_instruction_at_pc(core_state* state);
 

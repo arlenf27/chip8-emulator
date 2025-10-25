@@ -64,14 +64,14 @@ void delete_state(core_state* state){
 	free(state);
 }
 
-instruction_load_status load_program_instructions(core_state* state, uint8_t* bin_data){
+instruction_load_status load_program_instructions(core_state* state, uint8_t* bin_data, size_t bin_data_size){
 	if(bin_data == NULL) return NULL_POINTER_FAULT;
 	int i = MEMORY_PROGRAM_INSTRUCTIONS_START;
-	for(; i < MEMORY_RESERVED_VARIABLES_START && *bin_data != '\0'; i++){
+	for(; i < MEMORY_RESERVED_VARIABLES_START && i - MEMORY_PROGRAM_INSTRUCTIONS_START < bin_data_size; i++){
 		state->memory[i] = *bin_data;
 		bin_data++;
 	}
-	if(i == MEMORY_RESERVED_VARIABLES_START && *bin_data != '\0'){
+	if(i == MEMORY_RESERVED_VARIABLES_START && i - MEMORY_PROGRAM_INSTRUCTIONS_START < bin_data_size){
 		return MEMORY_OVERFLOW_FAULT;
 	}else{
 		return INSTR_LOAD_SUCCESS;
