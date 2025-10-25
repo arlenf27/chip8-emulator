@@ -1,0 +1,35 @@
+/*
+ * instructions.h
+ *
+ *  Created on: Oct 12, 2025
+ *      Author: Arlen Feng
+ */
+
+#ifndef CORE_INSTRUCTIONS_H_
+#define CORE_INSTRUCTIONS_H_
+
+/*** Instruction Definitions ***/
+
+#define INVALID_INSTR 0xFFFF
+
+typedef enum instruction_type{
+	EXECUTE_MACHINE_LANGUAGE_SUBROUTINE,
+	CLEAR_SCREEN,
+	RETURN_FROM_SUBROUTINE,
+	JUMP,
+	EXECUTE_SUBROUTINE,
+	SKIP_IF_VALUE_VX_EQUALS_NN,
+	SKIP_IF_VALUE_VX_NOT_EQUALS_NN,
+	SKIP_IF_VALUE_VX_EQUALS_VALUE_VY,
+	STORE_NN_IN_VX,
+	ADD_NN_TO_VX,
+	STORE_VALUE_VY_IN_VX,
+	SET_VX_TO_VX_OR_VY,
+	SET_VX_TO_VX_AND_VY,
+	SET_VX_TO_VX_XOR_VY,
+	ADD_VALUE_VY_TO_VX,
+	SUBTRACT_VALUE_VY_FROM_VX,
+
+} instruction_type;
+
+#endif /* CORE_INSTRUCTIONS_H_ */
