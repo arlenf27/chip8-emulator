@@ -25,7 +25,7 @@ struct core_state{
 	display_row display[NUM_DISPLAY_ROWS];
 };
 
-/*** Private Functions ***/
+/*** Public Functions ***/
 
 bool is_valid_instruction_address(uint16_t memory_address){
 	if(memory_address % 2 != 0 ||
@@ -36,13 +36,11 @@ bool is_valid_instruction_address(uint16_t memory_address){
 	return true;
 }
 
-/*** Public Functions ***/
-
 core_state* initialize_state(){
 	core_state* state = (core_state*) malloc(sizeof(core_state));
 	if(state != NULL){
 		for(size_t i = 0; i < MEMORY_SIZE; i++){
-			state->memory[i] = 0;
+			state->memory[i] = 0xFF;
 		}
 		for(size_t i = 0; i < STACK_SIZE; i++){
 			state->stack[i] = 0;
@@ -80,11 +78,30 @@ instruction_load_status load_program_instructions(core_state* state, uint8_t* bi
 	}
 }
 
-uint16_t get_instruction(core_state* state, uint16_t memory_address){
+uint16_t get_instruction_at_pc(core_state* state){
 	uint16_t instr = INVALID_INSTR;
+	uint16_t memory_address = state->pc;
 	if(is_valid_instruction_address(memory_address)){
 		instr = state->memory[memory_address] << 8;
 		instr |= state->memory[memory_address+1];
 	}
 	return instr;
+}
+
+generic_result increment_pc(core_state* state){
+	generic_result res = FAILURE;
+	if(is_valid_instruction_address(state->pc + 2)){
+		state->pc += 2;
+		res = SUCCESS;
+	}
+	return res;
+}
+
+generic_result set_pc(core_state* state, uint16_t memory_address){
+	generic_result res = FAILURE;
+	if(is_valid_instruction_address(memory_address)){
+		state->pc = memory_address;
+		res = SUCCESS;
+	}
+	return res;
 }

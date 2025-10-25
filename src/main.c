@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "core_state.h"
+#include "instructions.h"
 
 int main(int argc, char *argv[]) {
 	/* Test/Debug Code */
@@ -21,11 +22,18 @@ int main(int argc, char *argv[]) {
 	}
 	test_data[0] = 0x4E;
 	test_data[1] = 0x05;
-	test_data[2] = 0x34;
+	test_data[2] = 0xFF;
 	test_data[3] = 0xA0;
 	test_data[4] = '\0';
 	if(load_program_instructions(test_state, test_data) == INSTR_LOAD_SUCCESS){
-		printf("Getting instruction at 0x202: 0x%X", get_instruction(test_state, 0x202));
+		uint16_t instr = get_instruction_at_pc(test_state);
+		while(instr != INVALID_INSTR){
+			printf("0x%X\n", instr);
+			if(increment_pc(test_state) == FAILURE){
+				break;
+			}
+			instr = get_instruction_at_pc(test_state);
+		}
 	}else{
 		printf("Load Fault");
 	}

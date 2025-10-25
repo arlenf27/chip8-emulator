@@ -6,6 +6,7 @@
  */
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifndef CORE_STATE_H_
 #define CORE_STATE_H_
@@ -13,7 +14,7 @@
 /*** Core Memory Definitions ***/
 
 #define MEMORY_SIZE 0x1000
-#define MEMORY_RESERVED_INTERPRETER_START 0x01
+#define MEMORY_RESERVED_INTERPRETER_START 0x00
 #define MEMORY_PROGRAM_INSTRUCTIONS_START 0x0200
 #define MEMORY_RESERVED_VARIABLES_START 0x0EA0
 #define MEMORY_RESERVED_DISPLAY_START 0x0F00
@@ -46,6 +47,11 @@ typedef enum instruction_load_status{
 	NULL_POINTER_FAULT
 } instruction_load_status;
 
+typedef enum generic_result{
+	SUCCESS,
+	FAILURE
+} generic_result;
+
 /*** Struct Declarations ***/
 
 /**
@@ -55,6 +61,8 @@ typedef enum instruction_load_status{
 typedef struct core_state core_state;
 
 /*** Public Function Declarations ***/
+
+bool is_valid_instruction_address(uint16_t memory_address);
 
 core_state* initialize_state();
 
@@ -71,6 +79,10 @@ void delete_state(core_state* state);
  */
 instruction_load_status load_program_instructions(core_state* state, uint8_t* bin_data);
 
-uint16_t get_instruction(core_state* state, uint16_t memory_address);
+uint16_t get_instruction_at_pc(core_state* state);
+
+generic_result increment_pc(core_state* state);
+
+generic_result set_pc(core_state* state, uint16_t memory_address);
 
 #endif /* CORE_STATE_H_ */
