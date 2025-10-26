@@ -92,6 +92,6 @@ generic_result set_pc(core_state* state, uint16_t memory_address);
 
 stack_result push_pc_value_on_stack(core_state* state);
 
-stack_result pop_value_from_stack(core_state* state, uint16_t* result);
+stack_result pop_value_from_stack_to_pc(core_state* state);
 
 #endif /* CORE_STATE_H_ */

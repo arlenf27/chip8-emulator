@@ -113,9 +113,9 @@ stack_result push_pc_value_on_stack(core_state* state){
 	return STACK_SUCCESS;
 }
 
-stack_result pop_value_from_stack(core_state* state, uint16_t* result){
+stack_result pop_value_from_stack_to_pc(core_state* state){
 	if(state->sp <= 0) return STACK_UNDERFLOW;
 	state->sp--;
-	*result = state->stack[state->sp];
+	state->pc = state->stack[state->sp];
 	return STACK_SUCCESS;
 }
