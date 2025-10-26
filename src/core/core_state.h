@@ -47,6 +47,12 @@ typedef enum instruction_load_status{
 	NULL_POINTER_FAULT
 } instruction_load_status;
 
+typedef enum stack_result{
+	STACK_SUCCESS,
+	STACK_OVERFLOW,
+	STACK_UNDERFLOW
+} stack_result;
+
 typedef enum generic_result{
 	SUCCESS,
 	FAILURE
@@ -83,5 +89,9 @@ uint16_t get_instruction_at_pc(core_state* state);
 generic_result increment_pc(core_state* state);
 
 generic_result set_pc(core_state* state, uint16_t memory_address);
+
+stack_result push_pc_value_on_stack(core_state* state);
+
+stack_result pop_value_from_stack(core_state* state, uint16_t* result);
 
 #endif /* CORE_STATE_H_ */

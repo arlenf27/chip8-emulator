@@ -15,7 +15,7 @@
 
 struct core_state{
 	uint8_t memory[MEMORY_SIZE];
-	uint8_t stack[STACK_SIZE];
+	uint16_t stack[STACK_SIZE];
 	uint8_t v_registers[NUM_V_REGISTERS];
 	uint16_t pc;
 	uint16_t index_register;
@@ -104,4 +104,18 @@ generic_result set_pc(core_state* state, uint16_t memory_address){
 		res = SUCCESS;
 	}
 	return res;
+}
+
+stack_result push_pc_value_on_stack(core_state* state){
+	if(state->sp >= STACK_SIZE) return STACK_OVERFLOW;
+	state->stack[state->sp] = state->pc;
+	state->sp++;
+	return STACK_SUCCESS;
+}
+
+stack_result pop_value_from_stack(core_state* state, uint16_t* result){
+	if(state->sp <= 0) return STACK_UNDERFLOW;
+	state->sp--;
+	*result = state->stack[state->sp];
+	return STACK_SUCCESS;
 }

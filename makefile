@@ -1,6 +1,6 @@
 compile:
 	mkdir -p build
-	gcc -std=c99 -o build/chip8_emulator src/main.c src/core/core_state.c -lm -Wall -g -pedantic -Isrc/core
+	gcc -std=c11 -o build/chip8_emulator src/main.c src/core/core_state.c -lm -Wall -g -pedantic -Isrc/core
 
 compiler_version:
 	gcc --version
