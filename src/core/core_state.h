@@ -107,4 +107,14 @@ stack_result push_pc_value_on_stack(core_state* state);
 
 stack_result pop_value_from_stack_to_pc(core_state* state);
 
+generic_result set_v_register(core_state* state, uint8_t v_reg, uint8_t value);
+
+generic_result get_v_register(core_state* state, uint8_t v_reg, uint8_t* result);
+
+generic_result set_vf_to_flag_value(core_state* state, vf_flag_value value);
+
+generic_result set_index_register(core_state* state, uint16_t memory_address);
+
+generic_result get_index_register(core_state* state, uint16_t* result);
+
 #endif /* CORE_STATE_H_ */
