@@ -49,7 +49,7 @@ core_state* initialize_state(){
 			state->v_registers[i] = 0;
 		}
 		state->pc = MEMORY_PROGRAM_INSTRUCTIONS_START;
-		state->index_register = 0;
+		state->index_register = MEMORY_SIZE;
 		state->sp = 0;
 		state->dt = 0;
 		state->st = SOUND_OFF;
@@ -118,4 +118,34 @@ stack_result pop_value_from_stack_to_pc(core_state* state){
 	state->sp--;
 	state->pc = state->stack[state->sp];
 	return STACK_SUCCESS;
+}
+
+generic_result set_v_register(core_state* state, uint8_t v_reg, uint8_t value){
+	if(v_reg >= NUM_V_REGISTERS) return FAILURE;
+	state->v_registers[v_reg] = value;
+	return SUCCESS;
+}
+
+generic_result get_v_register(core_state* state, uint8_t v_reg, uint8_t* result){
+	if(v_reg >= NUM_V_REGISTERS) return FAILURE;
+	*result = state->v_registers[v_reg];
+	return SUCCESS;
+}
+
+generic_result set_vf_to_flag_value(core_state* state, vf_flag_value value){
+	if(value < 0 || value > 1) return FAILURE;
+	state->v_registers[0x0F] = (uint8_t) value;
+	return SUCCESS;
+}
+
+generic_result set_index_register(core_state* state, uint16_t memory_address){
+	if(memory_address >= MEMORY_SIZE) return FAILURE;
+	state->index_register = memory_address;
+	return SUCCESS;
+}
+
+generic_result get_index_register(core_state* state, uint16_t* result){
+	if(state->index_register >= MEMORY_SIZE) return FAILURE;
+	*result = state->index_register;
+	return SUCCESS;
 }

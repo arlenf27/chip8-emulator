@@ -8,6 +8,9 @@ compiler_version:
 clean: 
 	rm -f build/chip8_emulator
 	rm -rf build/*.dSYM
+
+run:
+	./build/chip8_emulator
 	
 macos_leaks_run:
 	leaks --atExit -- ./build/chip8_emulator

@@ -58,6 +58,19 @@ typedef enum generic_result{
 	FAILURE
 } generic_result;
 
+typedef enum vf_flag_value{
+	VF_NO_CARRY = 0x00,
+	VF_BORROW_OCCURS = 0x00,
+	VF_NO_SET_PIXELS_CHANGED_TO_UNSET = 0x00,
+	VF_LEAST_SIG_BIT_ZERO = 0x00,
+	VF_MOST_SIG_BIT_ZERO = 0x00,
+	VF_CARRY_OCCURS = 0x01,
+	VF_NO_BORROW = 0x01,
+	VF_ANY_SET_PIXELS_CHANGED_TO_UNSET = 0x01,
+	VF_LEAST_SIG_BIT_ONE = 0x01,
+	VF_MOST_SIG_BIT_ONE = 0x01,
+} vf_flag_value;
+
 /*** Struct Declarations ***/
 
 /**
