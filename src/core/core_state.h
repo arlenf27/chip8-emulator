@@ -1,15 +1,15 @@
 /*
- * memory.h
+ * core_state.h
  *
  *  Created on: Oct 10, 2025
  *      Author: Arlen Feng
  */
 
-#include <stdint.h>
-#include <stdbool.h>
-
 #ifndef CORE_STATE_H_
 #define CORE_STATE_H_
+
+#include <stdint.h>
+#include <stdbool.h>
 
 /*** Core Memory Definitions ***/
 

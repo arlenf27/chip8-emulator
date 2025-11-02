@@ -10,8 +10,8 @@
 #include "core_state.h"
 #include "instructions.h"
 
-int main(int argc, char *argv[]) {
-	/* Test/Debug Code */
+int main(int argc, char* argv[]) {
+	/* Debug Code */
 	core_state* test_state = initialize_state();
 	if(test_state == NULL){
 		exit(EXIT_FAILURE);

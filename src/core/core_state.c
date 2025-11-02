@@ -1,5 +1,5 @@
 /*
- * memory.c
+ * core_state.c
  *
  *  Created on: Oct 10, 2025
  *      Author: Arlen Feng
@@ -10,20 +10,7 @@
 #include <stdbool.h>
 #include "core_state.h"
 #include "instructions.h"
-
-/** Data Definitions */
-
-struct core_state{
-	uint8_t memory[MEMORY_SIZE];
-	uint16_t stack[STACK_SIZE];
-	uint8_t v_registers[NUM_V_REGISTERS];
-	uint16_t pc;
-	uint16_t index_register;
-	uint8_t sp;
-	uint8_t dt;
-	uint8_t st;
-	display_row display[NUM_DISPLAY_ROWS];
-};
+#include "core_state_internal.h"
 
 /*** Public Functions ***/
 
