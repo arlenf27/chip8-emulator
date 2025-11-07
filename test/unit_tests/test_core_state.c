@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "test_core.h"
+#include "test_core_state.h"
 #include "core_state.h"
 
 /*** Public Functions ***/
@@ -106,5 +107,21 @@ test_details test_initialize_state(){
 		}
 	}
 	delete_state((core_state*) test_state);
+	return details;
+}
+
+test_details test_is_valid_instruction_address(){
+	test_details details = {.name = (char*) __func__, .passed = true, .sub_checks_passed = 0, .sub_checks_failed = 0};
+	for(size_t i = 0; i < sizeof(test_cases_is_valid_instruction_address) / sizeof(test_case_is_valid_instruction_address); i++){
+		const test_case_is_valid_instruction_address* current = &test_cases_is_valid_instruction_address[i];
+		bool actual_output = is_valid_instruction_address(current->input);
+		if(EXPR_EQUAL(actual_output, current->expected_output)){
+			details.sub_checks_passed++;
+		}else{
+			fprintf(stderr, "Expected %d, but was %d instead. Failed at %s:%d. \n", current->expected_output, actual_output, __FILE__, __LINE__);
+			details.sub_checks_failed++;
+			details.passed = false;
+		}
+	}
 	return details;
 }

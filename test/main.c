@@ -8,10 +8,9 @@
 #include "test_core.h"
 #include "test_core_state.h"
 
-#define NUM_TESTS 1
-
 int main(int argc, char* argv[]){
-	const test_function test_functions[] = {test_initialize_state};
-	run_tests(test_functions, NUM_TESTS);
+	const test_function test_functions[] = {test_initialize_state, test_is_valid_instruction_address};
+	const int num_tests = sizeof(test_functions) / sizeof(test_function);
+	run_tests(test_functions, num_tests);
 	return 0;
 }
