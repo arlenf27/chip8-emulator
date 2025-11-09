@@ -66,7 +66,7 @@ instruction_load_status load_program_instructions(core_state* state, uint8_t* bi
 }
 
 uint16_t get_instruction_at_pc(core_state* state){
-	uint16_t instr = INVALID_INSTR;
+	uint16_t instr = GENERIC_INVALID_INSTR;
 	uint16_t memory_address = state->pc;
 	if(is_valid_instruction_address(memory_address)){
 		instr = state->memory[memory_address] << 8;

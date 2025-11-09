@@ -3,7 +3,7 @@ CFLAGS := -std=c11 -Wall -g -pedantic
 LDFLAGS := -lm
 
 MAIN_SRC := src/main.c
-CORE_SRCS := src/core/core_state.c
+CORE_SRCS := src/core/core_state.c src/core/instructions.c
 TEST_SRCS := test/main.c test/unit_tests/test_core_state.c test/test_core/test_core.c
 
 INCLUDE_PATHS_SRC := -Isrc/core

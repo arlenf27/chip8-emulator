@@ -8,9 +8,12 @@
 #ifndef CORE_INSTRUCTIONS_H_
 #define CORE_INSTRUCTIONS_H_
 
+#include <stdbool.h>
+#include "core_state.h"
+
 /*** Instruction Definitions ***/
 
-#define INVALID_INSTR 0xFFFF
+#define GENERIC_INVALID_INSTR 0xFFFF
 
 typedef enum instruction_type{
 	EXECUTE_MACHINE_LANGUAGE_SUBROUTINE,
@@ -47,7 +50,18 @@ typedef enum instruction_type{
 	SET_I_TO_MEMORY_ADDRESS_OF_SPRITE_DATA,
 	STORE_BINARY_CODED_DECIMAL_EQUIVALENT,
 	STORE_VALUES_V0_VX,
-	FILL_REGISTERS_V0_VX
+	FILL_REGISTERS_V0_VX,
+	INVALID_INSTRUCTION_TYPE
 } instruction_type;
+
+typedef struct instruction_result{
+	instruction_type type;
+	bool success;
+	char* custom_message;
+} instruction_result;
+
+/*** Public Function Declarations ***/
+
+instruction_result execute_instruction(uint16_t instruction, core_state* state);
 
 #endif /* CORE_INSTRUCTIONS_H_ */

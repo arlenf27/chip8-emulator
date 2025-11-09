@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
 	test_data[3] = 0xA0;
 	if(load_program_instructions(test_state, test_data, 4) == INSTR_LOAD_SUCCESS){
 		uint16_t instr = get_instruction_at_pc(test_state);
-		while(instr != INVALID_INSTR){
+		while(instr != GENERIC_INVALID_INSTR){
 			printf("0x%X\n", instr);
 			if(increment_pc(test_state) == FAILURE){
 				break;
