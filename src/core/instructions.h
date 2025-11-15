@@ -57,7 +57,7 @@ typedef enum instruction_type{
 typedef struct instruction_result{
 	instruction_type type;
 	bool success;
-	char* custom_message;
+	const char* custom_message;
 } instruction_result;
 
 /*** Public Function Declarations ***/

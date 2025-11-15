@@ -19,6 +19,14 @@ typedef struct hex_digits{
 	unsigned int hex3: 4;
 } hex_digits;
 
+/*** Private Function Declarations ***/
+
+void execute_subroutine(core_state* state, uint16_t subroutine_address, bool* success, const char* custom_message);
+
+void return_from_subroutine(core_state* state, bool* success, const char* custom_message);
+
+void jump(core_state* state, uint16_t address, bool* success, const char* custom_message);
+
 /*** Public Functions ***/
 
 instruction_result execute_instruction(uint16_t instruction, core_state* state){
@@ -45,7 +53,7 @@ instruction_result execute_instruction(uint16_t instruction, core_state* state){
 				case 0x0EE:
 				{
 					result.type = RETURN_FROM_SUBROUTINE;
-					/* TODO: Handle RETURN_FROM_SUBROUTINE */
+					return_from_subroutine(state, &result.success, result.custom_message);
 					break;
 				}
 				default:
@@ -60,13 +68,13 @@ instruction_result execute_instruction(uint16_t instruction, core_state* state){
 		case 0x1:
 		{
 			result.type = JUMP;
-			/* TODO: Handle JUMP */
+			jump(state, lower_3_hex_digits, &result.success, result.custom_message);
 			break;
 		}
 		case 0x2:
 		{
 			result.type = EXECUTE_SUBROUTINE;
-			/* TODO: Handle EXECUTE_SUBROUTINE */
+			execute_subroutine(state, lower_3_hex_digits, &result.success, result.custom_message);
 			break;
 		}
 		case 0x3:
@@ -296,4 +304,41 @@ instruction_result execute_instruction(uint16_t instruction, core_state* state){
 		}
 	}
 	return result;
+}
+
+/*** Private Functions ***/
+
+void execute_subroutine(core_state* state, uint16_t subroutine_address, bool* success, const char* custom_message){
+	if(push_pc_value_on_stack(state) != STACK_OVERFLOW){
+		if(set_pc(state, subroutine_address) == SUCCESS){
+			custom_message = "";
+			*success = true;
+		}else{
+			custom_message = "Setting pc failed, invalid memory address. \n";
+			*success = false;
+		}
+	}else{
+		custom_message = "Stack overflow while pushing pc value onto stack, too many nested subroutines. \n";
+		*success = false;
+	}
+}
+
+void return_from_subroutine(core_state* state, bool* success, const char* custom_message){
+	if(pop_value_from_stack_to_pc(state) != STACK_UNDERFLOW){
+		custom_message = "";
+		*success = true;
+	}else{
+		custom_message = "Stack underflow while pushing pc value onto stack, no pc value stored. \n";
+		*success = false;
+	}
+}
+
+void jump(core_state* state, uint16_t address, bool* success, const char* custom_message){
+	if(set_pc(state, address) == SUCCESS){
+		custom_message = "";
+		*success = true;
+	}else{
+		custom_message = "Setting pc failed, invalid memory address. \n";
+		*success = false;
+	}
 }
