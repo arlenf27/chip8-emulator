@@ -21,11 +21,15 @@ typedef struct hex_digits{
 
 /*** Private Function Declarations ***/
 
-void execute_subroutine(core_state* state, uint16_t subroutine_address, bool* success, const char* custom_message);
+bool go_to_next_instruction(core_state* state, const char** increment_message);
 
-void return_from_subroutine(core_state* state, bool* success, const char* custom_message);
+void execute_subroutine(core_state* state, uint16_t subroutine_address, bool* success, const char** custom_message);
 
-void jump(core_state* state, uint16_t address, bool* success, const char* custom_message);
+void return_from_subroutine(core_state* state, bool* success, const char** custom_message);
+
+void jump(core_state* state, uint16_t address, bool* success, const char** custom_message);
+
+void skip_if_value_vx_equals_nn(core_state* state, uint8_t nn, uint8_t v_reg, bool* success, const char** custom_message);
 
 /*** Public Functions ***/
 
@@ -53,7 +57,7 @@ instruction_result execute_instruction(uint16_t instruction, core_state* state){
 				case 0x0EE:
 				{
 					result.type = RETURN_FROM_SUBROUTINE;
-					return_from_subroutine(state, &result.success, result.custom_message);
+					return_from_subroutine(state, &result.success, &result.custom_message);
 					break;
 				}
 				default:
@@ -68,19 +72,19 @@ instruction_result execute_instruction(uint16_t instruction, core_state* state){
 		case 0x1:
 		{
 			result.type = JUMP;
-			jump(state, lower_3_hex_digits, &result.success, result.custom_message);
+			jump(state, lower_3_hex_digits, &result.success, &result.custom_message);
 			break;
 		}
 		case 0x2:
 		{
 			result.type = EXECUTE_SUBROUTINE;
-			execute_subroutine(state, lower_3_hex_digits, &result.success, result.custom_message);
+			execute_subroutine(state, lower_3_hex_digits, &result.success, &result.custom_message);
 			break;
 		}
 		case 0x3:
 		{
 			result.type = SKIP_IF_VALUE_VX_EQUALS_NN;
-			/* TODO: Handle SKIP_IF_VALUE_VX_EQUALS_NN */
+			skip_if_value_vx_equals_nn(state, lower_2_hex_digits, (uint8_t) digits.hex2, &result.success, &result.custom_message);
 			break;
 		}
 		case 0x4:
@@ -308,37 +312,66 @@ instruction_result execute_instruction(uint16_t instruction, core_state* state){
 
 /*** Private Functions ***/
 
-void execute_subroutine(core_state* state, uint16_t subroutine_address, bool* success, const char* custom_message){
+bool go_to_next_instruction(core_state* state, const char** increment_message){
+	bool res = false;
+	if(increment_pc(state) == SUCCESS){
+		res = true;
+	}else{
+		*increment_message = "Unable to increment pc. \n";
+	}
+	return res;
+}
+
+void execute_subroutine(core_state* state, uint16_t subroutine_address, bool* success, const char** custom_message){
 	if(push_pc_value_on_stack(state) != STACK_OVERFLOW){
 		if(set_pc(state, subroutine_address) == SUCCESS){
-			custom_message = "";
+			*custom_message = "";
 			*success = true;
 		}else{
-			custom_message = "Setting pc failed, invalid memory address. \n";
+			*custom_message = "Setting pc failed, invalid memory address. \n";
 			*success = false;
 		}
 	}else{
-		custom_message = "Stack overflow while pushing pc value onto stack, too many nested subroutines. \n";
+		*custom_message = "Stack overflow while pushing pc value onto stack, too many nested subroutines. \n";
 		*success = false;
 	}
 }
 
-void return_from_subroutine(core_state* state, bool* success, const char* custom_message){
+void return_from_subroutine(core_state* state, bool* success, const char** custom_message){
 	if(pop_value_from_stack_to_pc(state) != STACK_UNDERFLOW){
-		custom_message = "";
-		*success = true;
+		*custom_message = "";
+		*success = go_to_next_instruction(state, custom_message);
 	}else{
-		custom_message = "Stack underflow while pushing pc value onto stack, no pc value stored. \n";
+		*custom_message = "Stack underflow while pushing pc value onto stack, no pc value stored. \n";
 		*success = false;
 	}
 }
 
-void jump(core_state* state, uint16_t address, bool* success, const char* custom_message){
+void jump(core_state* state, uint16_t address, bool* success, const char** custom_message){
 	if(set_pc(state, address) == SUCCESS){
-		custom_message = "";
+		*custom_message = "";
 		*success = true;
 	}else{
-		custom_message = "Setting pc failed, invalid memory address. \n";
+		*custom_message = "Setting pc failed, invalid memory address. \n";
+		*success = false;
+	}
+}
+
+void skip_if_value_vx_equals_nn(core_state* state, uint8_t nn, uint8_t v_reg, bool* success, const char** custom_message){
+	uint8_t to_compare = 0;
+	if(get_v_register(state, v_reg, &to_compare) == SUCCESS){
+		if(to_compare == nn){
+			*custom_message = "Value VX equals NN, skipping. \n";
+			*success = go_to_next_instruction(state, custom_message);
+		}else{
+			*custom_message = "Value VX not equals NN, not skipping. \n";
+			*success = true;
+		}
+		if(*success){
+			*success = go_to_next_instruction(state, custom_message);
+		}
+	}else{
+		*custom_message = "Getting value of register failed, invalid register. \n";
 		*success = false;
 	}
 }
