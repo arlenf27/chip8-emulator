@@ -12,7 +12,12 @@
 
 int main(int argc, char* argv[]){
 	srand(time(NULL));
-	const test_function test_functions[] = {test_initialize_state, test_is_valid_instruction_address, test_load_program_instructions};
+	const test_function test_functions[] = {
+			test_initialize_state,
+			test_is_valid_instruction_address,
+			test_load_program_instructions,
+			test_get_instruction_at_pc
+	};
 	const int num_tests = sizeof(test_functions) / sizeof(test_function);
 	run_tests(test_functions, num_tests);
 	return 0;

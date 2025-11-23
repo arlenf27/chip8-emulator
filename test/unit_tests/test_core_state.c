@@ -12,6 +12,7 @@
 #include "test_core.h"
 #include "test_core_state.h"
 #include "core_state.h"
+#include "instructions.h"
 
 /*** Public Functions ***/
 
@@ -140,20 +141,20 @@ test_details test_load_program_instructions(){
 				bin_data = NULL;
 			}
 			if(bin_data != NULL){
-				for(int i = 0; i < current->bin_data_size; i++){
-					bin_data[i] = (rand() % (0xFF + 0x01));
+				for(int j = 0; j < current->bin_data_size; j++){
+					bin_data[j] = (rand() % (0xFF + 0x01));
 				}
-				for(size_t i = 0; i < MEMORY_SIZE; i++){
-					test_state->memory[i] = 0xFF;
+				for(size_t j = 0; j < MEMORY_SIZE; j++){
+					test_state->memory[j] = 0xFF;
 				}
 				instruction_load_status actual_status = load_program_instructions(test_state, bin_data, current->bin_data_size);
-				for(int i = 0; i < current->bin_data_size && i < (MEMORY_RESERVED_VARIABLES_START - MEMORY_PROGRAM_INSTRUCTIONS_START); i++){
-					const uint8_t actual_data = test_state->memory[i + MEMORY_PROGRAM_INSTRUCTIONS_START];
-					const uint8_t expected_data = bin_data[i];
+				for(int j = 0; j < current->bin_data_size && j < (MEMORY_RESERVED_VARIABLES_START - MEMORY_PROGRAM_INSTRUCTIONS_START); j++){
+					const uint8_t actual_data = test_state->memory[j + MEMORY_PROGRAM_INSTRUCTIONS_START];
+					const uint8_t expected_data = bin_data[j];
 					if(EXPR_EQUAL(actual_data, expected_data)){
 						details.sub_checks_passed++;
 					}else{
-						fprintf(stderr, "Expected core state's memory byte %d to be %d, but was %d instead. Failed at %s:%d. \n", i, expected_data, actual_data, __FILE__, __LINE__);
+						fprintf(stderr, "Expected core state's memory byte %d to be %d, but was %d instead. Failed at %s:%d. \n", j, expected_data, actual_data, __FILE__, __LINE__);
 						details.sub_checks_failed++;
 						details.passed = false;
 					}
@@ -167,6 +168,40 @@ test_details test_load_program_instructions(){
 				}
 			}
 			free(bin_data);
+		}
+		free(test_state);
+	}
+	return details;
+}
+
+test_details test_get_instruction_at_pc(){
+	test_details details = {.name = (char*) __func__, .passed = true, .sub_checks_passed = 0, .sub_checks_failed = 0};
+	for(size_t i = 0; i < sizeof(test_cases_get_instruction_at_pc) / sizeof(test_case_get_instruction_at_pc); i++){
+		core_state* test_state = (core_state*) malloc(sizeof(core_state));
+		if(test_state != NULL){
+			for(size_t j = 0; j < MEMORY_SIZE; j++){
+				test_state->memory[j] = 0x5A;
+			}
+			const test_case_get_instruction_at_pc* current = &test_cases_get_instruction_at_pc[i];
+			test_state->pc = current->current_pc;
+			uint16_t actual_instr = get_instruction_at_pc(test_state);
+			if(current->expect_invalid_instr){
+				if(EXPR_EQUAL(actual_instr, GENERIC_INVALID_INSTR)){
+					details.sub_checks_passed++;
+				}else{
+					fprintf(stderr, "Expected %d, but was %d instead. Failed at %s:%d. \n", GENERIC_INVALID_INSTR, actual_instr, __FILE__, __LINE__);
+					details.sub_checks_failed++;
+					details.passed = false;
+				}
+			}else{
+				if(EXPR_EQUAL(actual_instr, 0x5A5A)){
+					details.sub_checks_passed++;
+				}else{
+					fprintf(stderr, "Expected %d, but was %d instead. Failed at %s:%d. \n", 0x5A5A, actual_instr, __FILE__, __LINE__);
+					details.sub_checks_failed++;
+					details.passed = false;
+				}
+			}
 		}
 		free(test_state);
 	}

@@ -24,6 +24,11 @@ typedef struct test_case_load_program_instructions{
 	instruction_load_status expected_status;
 } test_case_load_program_instructions;
 
+typedef struct test_case_get_instruction_at_pc{
+	uint16_t current_pc;
+	bool expect_invalid_instr;
+} test_case_get_instruction_at_pc;
+
 /*** Public Global Static Data ***/
 
 static const test_case_is_valid_instruction_address test_cases_is_valid_instruction_address[] = {
@@ -44,6 +49,13 @@ static const test_case_load_program_instructions test_cases_load_program_instruc
 		{.bin_data_size = 0x200, .expected_status = INSTR_LOAD_SUCCESS}
 };
 
+static const test_case_get_instruction_at_pc test_cases_get_instruction_at_pc[] = {
+		{.current_pc = MEMORY_PROGRAM_INSTRUCTIONS_START - 2, .expect_invalid_instr = true},
+		{.current_pc = MEMORY_PROGRAM_INSTRUCTIONS_START, .expect_invalid_instr = false},
+		{.current_pc = MEMORY_RESERVED_VARIABLES_START, .expect_invalid_instr = true},
+		{.current_pc = MEMORY_PROGRAM_INSTRUCTIONS_START + 0xB3, .expect_invalid_instr = true}
+};
+
 /*** Public Function Declarations ***/
 
 test_details test_initialize_state();
@@ -55,5 +67,7 @@ test_details test_is_valid_instruction_address();
  * Recommendation: srand() should be called to seed the pseudo-random number generator at unit test program start.
  */
 test_details test_load_program_instructions();
+
+test_details test_get_instruction_at_pc();
 
 #endif /* TEST_CORE_STATE_H_ */
