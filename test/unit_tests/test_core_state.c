@@ -125,3 +125,50 @@ test_details test_is_valid_instruction_address(){
 	}
 	return details;
 }
+
+test_details test_load_program_instructions(){
+	test_details details = {.name = (char*) __func__, .passed = true, .sub_checks_passed = 0, .sub_checks_failed = 0};
+	for(size_t i = 0; i < sizeof(test_cases_load_program_instructions) / sizeof(test_case_load_program_instructions); i++){
+		core_state* test_state = (core_state*) malloc(sizeof(core_state));
+		if(test_state != NULL){
+			const test_case_load_program_instructions* current = &test_cases_load_program_instructions[i];
+			uint8_t* bin_data;
+			if(current->bin_data_size != 0){
+				bin_data = (uint8_t*) malloc(sizeof(uint8_t) * current->bin_data_size);
+			}else{
+				/* Testing NULL input with 0 length. */
+				bin_data = NULL;
+			}
+			if(bin_data != NULL){
+				for(int i = 0; i < current->bin_data_size; i++){
+					bin_data[i] = (rand() % (0xFF + 0x01));
+				}
+				for(size_t i = 0; i < MEMORY_SIZE; i++){
+					test_state->memory[i] = 0xFF;
+				}
+				instruction_load_status actual_status = load_program_instructions(test_state, bin_data, current->bin_data_size);
+				for(int i = 0; i < current->bin_data_size && i < (MEMORY_RESERVED_VARIABLES_START - MEMORY_PROGRAM_INSTRUCTIONS_START); i++){
+					const uint8_t actual_data = test_state->memory[i + MEMORY_PROGRAM_INSTRUCTIONS_START];
+					const uint8_t expected_data = bin_data[i];
+					if(EXPR_EQUAL(actual_data, expected_data)){
+						details.sub_checks_passed++;
+					}else{
+						fprintf(stderr, "Expected core state's memory byte %d to be %d, but was %d instead. Failed at %s:%d. \n", i, expected_data, actual_data, __FILE__, __LINE__);
+						details.sub_checks_failed++;
+						details.passed = false;
+					}
+				}
+				if(EXPR_EQUAL(actual_status, current->expected_status)){
+					details.sub_checks_passed++;
+				}else{
+					fprintf(stderr, "Expected status enumeration %d, but was %d instead. Failed at %s:%d. \n", current->expected_status, actual_status, __FILE__, __LINE__);
+					details.sub_checks_failed++;
+					details.passed = false;
+				}
+			}
+			free(bin_data);
+		}
+		free(test_state);
+	}
+	return details;
+}
