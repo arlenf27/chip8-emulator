@@ -207,3 +207,63 @@ test_details test_get_instruction_at_pc(){
 	}
 	return details;
 }
+
+test_details test_increment_pc(){
+	test_details details = {.name = (char*) __func__, .passed = true, .sub_checks_passed = 0, .sub_checks_failed = 0};
+	for(size_t i = 0; i < sizeof(test_cases_increment_pc) / sizeof(test_case_increment_pc); i++){
+		core_state* test_state = (core_state*) malloc(sizeof(core_state));
+		if(test_state != NULL){
+			const test_case_increment_pc* current = &test_cases_increment_pc[i];
+			test_state->pc = current->current_pc;
+			generic_result actual_res = increment_pc(test_state);
+			if(EXPR_EQUAL(actual_res, current->expected_result)){
+				details.sub_checks_passed++;
+			}else{
+				fprintf(stderr, "Expected %d, but was %d instead. Failed at %s:%d. \n", current->expected_result, actual_res, __FILE__, __LINE__);
+				details.sub_checks_failed++;
+				details.passed = false;
+			}
+			if(current->expected_result == SUCCESS){
+				if(EXPR_EQUAL(test_state->pc, current->current_pc + 2)){
+					details.sub_checks_passed++;
+				}else{
+					fprintf(stderr, "Expected new pc to be %d, but was %d instead. Failed at %s:%d. \n", current->current_pc + 2, test_state->pc, __FILE__, __LINE__);
+					details.sub_checks_failed++;
+					details.passed = false;
+				}
+			}
+		}
+		free(test_state);
+	}
+	return details;
+}
+
+test_details test_set_pc(){
+	test_details details = {.name = (char*) __func__, .passed = true, .sub_checks_passed = 0, .sub_checks_failed = 0};
+	for(size_t i = 0; i < sizeof(test_cases_set_pc) / sizeof(test_case_set_pc); i++){
+		core_state* test_state = (core_state*) malloc(sizeof(core_state));
+		if(test_state != NULL){
+			const test_case_set_pc* current = &test_cases_set_pc[i];
+			test_state->pc = MEMORY_PROGRAM_INSTRUCTIONS_START;
+			generic_result actual_res = set_pc(test_state, current->memory_address);
+			if(EXPR_EQUAL(actual_res, current->expected_result)){
+				details.sub_checks_passed++;
+			}else{
+				fprintf(stderr, "Expected %d, but was %d instead. Failed at %s:%d. \n", current->expected_result, actual_res, __FILE__, __LINE__);
+				details.sub_checks_failed++;
+				details.passed = false;
+			}
+			if(current->expected_result == SUCCESS){
+				if(EXPR_EQUAL(test_state->pc, current->memory_address)){
+					details.sub_checks_passed++;
+				}else{
+					fprintf(stderr, "Expected new pc to be %d, but was %d instead. Failed at %s:%d. \n", current->memory_address, test_state->pc, __FILE__, __LINE__);
+					details.sub_checks_failed++;
+					details.passed = false;
+				}
+			}
+		}
+		free(test_state);
+	}
+	return details;
+}

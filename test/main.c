@@ -16,7 +16,9 @@ int main(int argc, char* argv[]){
 			test_initialize_state,
 			test_is_valid_instruction_address,
 			test_load_program_instructions,
-			test_get_instruction_at_pc
+			test_get_instruction_at_pc,
+			test_increment_pc,
+			test_set_pc
 	};
 	const int num_tests = sizeof(test_functions) / sizeof(test_function);
 	run_tests(test_functions, num_tests);
