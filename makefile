@@ -44,3 +44,9 @@ run_tests:
 	
 macos_leaks_run_tests:
 	leaks --atExit -- ./$(TARGET_TEST)
+	
+valgrind_run:
+	valgrind --leak-check=yes  ./$(TARGET)
+	
+valgrind_run_tests:
+	valgrind --leak-check=yes ./$(TARGET_TEST)

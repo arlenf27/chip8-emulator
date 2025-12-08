@@ -4,3 +4,7 @@
 .settings
 build
 build_test
+.codelite
+.ctagsd
+chip8-emulator.workspace
+compile_flags.txt
