@@ -267,3 +267,41 @@ test_details test_set_pc(){
 	}
 	return details;
 }
+
+test_details test_push_pc_value_on_stack(){
+	test_details details = {.name = (char*) __func__, .passed = true, .sub_checks_passed = 0, .sub_checks_failed = 0};
+	for(size_t i = 0; i < sizeof(test_cases_push_pc_value_on_stack) / sizeof(test_case_push_pc_value_on_stack); i++){
+		core_state* test_state = (core_state*) malloc(sizeof(core_state));
+		if(test_state != NULL){
+			const test_case_push_pc_value_on_stack* current = &test_cases_push_pc_value_on_stack[i];
+			test_state->sp = current->current_sp;
+			test_state->pc = 0x005A;
+			stack_result actual_res = push_pc_value_on_stack(test_state);
+			if(EXPR_EQUAL(actual_res, current->expected_result)){
+				details.sub_checks_passed++;
+			}else{
+				fprintf(stderr, "Expected %d, but was %d instead. Failed at %s:%d. \n", current->expected_result, actual_res, __FILE__, __LINE__);
+				details.sub_checks_failed++;
+				details.passed = false;
+			}
+			if(current->expected_result == STACK_SUCCESS){
+				if(EXPR_EQUAL(test_state->stack[current->current_sp], test_state->pc)){
+					details.sub_checks_passed++;
+				}else{
+					fprintf(stderr, "Expected new top of stack to be %d, but was %d instead. Failed at %s:%d. \n", test_state->pc, test_state->stack[current->current_sp], __FILE__, __LINE__);
+					details.sub_checks_failed++;
+					details.passed = false;
+				}
+				if(EXPR_EQUAL(test_state->sp, current->current_sp + 1)){
+					details.sub_checks_passed++;
+				}else{
+					fprintf(stderr, "Expected %d, but was %d instead. Failed at %s:%d. \n", current->current_sp + 1, test_state->sp, __FILE__, __LINE__);
+					details.sub_checks_failed++;
+					details.passed = false;
+				}
+			}
+		}
+		free(test_state);
+	}
+	return details;
+}
