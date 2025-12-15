@@ -6,6 +6,7 @@
  */
 
 #include <stdint.h>
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -101,7 +102,7 @@ test_details test_initialize_state(){
 			if(EXPR_EQUAL(actual_display_row, expected_display_row)){
 				details.sub_checks_passed++;
 			}else{
-				fprintf(stderr, "Expected core state's display row %d's integer representation of pixels to be %lX, but was %lX instead. Failed at %s:%d. \n", i, expected_display_row, actual_display_row, __FILE__, __LINE__);
+				fprintf(stderr, "Expected core state's display row %d's integer representation of pixels to be %" PRIx64 ", but was %" PRIx64 " instead. Failed at %s:%d. \n", i, expected_display_row, actual_display_row, __FILE__, __LINE__);
 				details.sub_checks_failed++;
 				details.passed = false;
 			}
