@@ -44,6 +44,11 @@ typedef struct test_case_push_pc_value_on_stack{
 	stack_result expected_result;
 } test_case_push_pc_value_on_stack;
 
+typedef struct test_case_pop_value_from_stack_to_pc{
+	uint8_t current_sp;
+	stack_result expected_result;
+} test_case_pop_value_from_stack_to_pc;
+
 /*** Public Global Static Data ***/
 
 static const test_case_is_valid_instruction_address test_cases_is_valid_instruction_address[] = {
@@ -91,6 +96,12 @@ static const test_case_push_pc_value_on_stack test_cases_push_pc_value_on_stack[
 	{.current_sp = STACK_SIZE, .expected_result = STACK_OVERFLOW}
 };
 
+static const test_case_pop_value_from_stack_to_pc test_cases_pop_value_from_stack_to_pc[] = {
+	{.current_sp = 0, .expected_result = STACK_UNDERFLOW},
+	{.current_sp = 1, .expected_result = STACK_SUCCESS},
+	{.current_sp = STACK_SIZE, .expected_result = STACK_SUCCESS}
+};
+
 /*** Public Function Declarations ***/
 
 test_details test_initialize_state();
@@ -110,5 +121,7 @@ test_details test_increment_pc();
 test_details test_set_pc();
 
 test_details test_push_pc_value_on_stack();
+
+test_details test_pop_value_from_stack_to_pc();
 
 #endif /* TEST_CORE_STATE_H_ */

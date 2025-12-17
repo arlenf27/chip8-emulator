@@ -306,3 +306,43 @@ test_details test_push_pc_value_on_stack(){
 	}
 	return details;
 }
+
+test_details test_pop_value_from_stack_to_pc(){
+	test_details details = {.name = (char*) __func__, .passed = true, .sub_checks_passed = 0, .sub_checks_failed = 0};
+	for(size_t i = 0; i < sizeof(test_cases_pop_value_from_stack_to_pc) / sizeof(test_case_pop_value_from_stack_to_pc); i++){
+		core_state* test_state = (core_state*) malloc(sizeof(core_state));
+		if(test_state != NULL){
+			const test_case_pop_value_from_stack_to_pc* current = &test_cases_pop_value_from_stack_to_pc[i];
+			test_state->sp = current->current_sp;
+			if(current->current_sp > 0){
+				test_state->stack[current->current_sp - 1] = 0x00A5;
+			}
+			stack_result actual_res = pop_value_from_stack_to_pc(test_state);
+			if(EXPR_EQUAL(actual_res, current->expected_result)){
+				details.sub_checks_passed++;
+			}else{
+				fprintf(stderr, "Expected %d, but was %d instead. Failed at %s:%d. \n", current->expected_result, actual_res, __FILE__, __LINE__);
+				details.sub_checks_failed++;
+				details.passed = false;
+			}
+			if(current->expected_result == STACK_SUCCESS){
+				if(EXPR_EQUAL(test_state->pc, 0x00A5)){
+					details.sub_checks_passed++;
+				}else{
+					fprintf(stderr, "Expected new pc to be %d, but was %d instead. Failed at %s:%d. \n", 0x00A5, test_state->pc, __FILE__, __LINE__);
+					details.sub_checks_failed++;
+					details.passed = false;
+				}
+				if(EXPR_EQUAL(test_state->sp, current->current_sp - 1)){
+					details.sub_checks_passed++;
+				}else{
+					fprintf(stderr, "Expected %d, but was %d instead. Failed at %s:%d. \n", current->current_sp - 1, test_state->sp, __FILE__, __LINE__);
+					details.sub_checks_failed++;
+					details.passed = false;
+				}
+			}
+		}
+		free(test_state);
+	}
+	return details;
+}
