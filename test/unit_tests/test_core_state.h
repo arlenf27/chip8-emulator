@@ -49,6 +49,31 @@ typedef struct test_case_pop_value_from_stack_to_pc{
 	stack_result expected_result;
 } test_case_pop_value_from_stack_to_pc;
 
+typedef struct test_case_set_v_register{
+	uint8_t v_reg;
+	generic_result expected_result;
+} test_case_set_v_register;
+
+typedef struct test_case_get_v_register{
+	uint8_t v_reg;
+	generic_result expected_result;
+} test_case_get_v_register;
+
+typedef struct test_case_set_vf_to_flag_value{
+	vf_flag_value value;
+	generic_result expected_result;
+} test_case_set_vf_to_flag_value;
+
+typedef struct test_case_set_index_register{
+	uint16_t memory_address;
+	generic_result expected_result;
+} test_case_set_index_register;
+
+typedef struct test_case_get_index_register{
+	uint16_t current_index_register;
+	generic_result expected_result;
+} test_case_get_index_register;
+
 /*** Public Global Static Data ***/
 
 static const test_case_is_valid_instruction_address test_cases_is_valid_instruction_address[] = {
@@ -102,6 +127,38 @@ static const test_case_pop_value_from_stack_to_pc test_cases_pop_value_from_stac
 	{.current_sp = STACK_SIZE, .expected_result = STACK_SUCCESS}
 };
 
+static const test_case_set_v_register test_cases_set_v_register[] = {
+	{.v_reg = 0x00, .expected_result = SUCCESS},
+	{.v_reg = 0x0A, .expected_result = SUCCESS},
+	{.v_reg = 0x0F, .expected_result = SUCCESS},
+	{.v_reg = NUM_V_REGISTERS, .expected_result = FAILURE}
+};
+
+static const test_case_get_v_register test_cases_get_v_register[] = {
+	{.v_reg = 0x00, .expected_result = SUCCESS},
+	{.v_reg = 0x0A, .expected_result = SUCCESS},
+	{.v_reg = 0x0F, .expected_result = SUCCESS},
+	{.v_reg = NUM_V_REGISTERS, .expected_result = FAILURE}
+};
+
+static const test_case_set_vf_to_flag_value test_cases_set_vf_to_flag_value[] = {
+	{.value = VF_NO_CARRY, .expected_result = SUCCESS},
+	{.value = VF_NO_BORROW, .expected_result = SUCCESS},
+	{.value = (vf_flag_value) 0x02, .expected_result = FAILURE}
+};
+
+static const test_case_set_index_register test_cases_set_index_register[] = {
+	{.memory_address = MEMORY_PROGRAM_INSTRUCTIONS_START, .expected_result = SUCCESS},
+	{.memory_address = MEMORY_RESERVED_VARIABLES_START, .expected_result = SUCCESS},
+	{.memory_address = MEMORY_SIZE, .expected_result = FAILURE}
+};
+
+static const test_case_get_index_register test_cases_get_index_register[] = {
+	{.current_index_register = 0x0000, .expected_result = SUCCESS},
+	{.current_index_register = 0x07FF, .expected_result = SUCCESS},
+	{.current_index_register = MEMORY_SIZE, .expected_result = FAILURE}
+};
+
 /*** Public Function Declarations ***/
 
 test_details test_initialize_state();
@@ -123,5 +180,15 @@ test_details test_set_pc();
 test_details test_push_pc_value_on_stack();
 
 test_details test_pop_value_from_stack_to_pc();
+
+test_details test_set_v_register();
+
+test_details test_get_v_register();
+
+test_details test_set_vf_to_flag_value();
+
+test_details test_set_index_register();
+
+test_details test_get_index_register();
 
 #endif /* TEST_CORE_STATE_H_ */

@@ -346,3 +346,162 @@ test_details test_pop_value_from_stack_to_pc(){
 	}
 	return details;
 }
+
+test_details test_set_v_register(){
+	test_details details = {.name = (char*) __func__, .passed = true, .sub_checks_passed = 0, .sub_checks_failed = 0};
+	for(size_t i = 0; i < sizeof(test_cases_set_v_register) / sizeof(test_case_set_v_register); i++){
+		core_state* test_state = (core_state*) malloc(sizeof(core_state));
+		if(test_state != NULL){
+			for(size_t j = 0; j < NUM_V_REGISTERS; j++){
+				test_state->v_registers[j] = 0xFF;
+			}
+			const test_case_set_v_register* current = &test_cases_set_v_register[i];
+			generic_result actual_res = set_v_register(test_state, current->v_reg, 0x5A);
+			if(EXPR_EQUAL(actual_res, current->expected_result)){
+				details.sub_checks_passed++;
+			}else{
+				fprintf(stderr, "Expected %d, but was %d instead. Failed at %s:%d. \n", current->expected_result, actual_res, __FILE__, __LINE__);
+				details.sub_checks_failed++;
+				details.passed = false;
+			}
+			if(current->expected_result == SUCCESS){
+				if(EXPR_EQUAL(test_state->v_registers[current->v_reg], 0x5A)){
+					details.sub_checks_passed++;
+				}else{
+					fprintf(stderr, "Expected v register %d to be %d, but was %d instead. Failed at %s:%d. \n", current->v_reg, 0x5A, test_state->v_registers[current->v_reg], __FILE__, __LINE__);
+					details.sub_checks_failed++;
+					details.passed = false;
+				}
+			}
+		}
+		free(test_state);
+	}
+	return details;
+}
+
+test_details test_get_v_register(){
+	test_details details = {.name = (char*) __func__, .passed = true, .sub_checks_passed = 0, .sub_checks_failed = 0};
+	for(size_t i = 0; i < sizeof(test_cases_get_v_register) / sizeof(test_case_get_v_register); i++){
+		core_state* test_state = (core_state*) malloc(sizeof(core_state));
+		if(test_state != NULL){
+			for(size_t j = 0; j < NUM_V_REGISTERS; j++){
+				test_state->v_registers[j] = (uint8_t) (j + 1);
+			}
+			const test_case_get_v_register* current = &test_cases_get_v_register[i];
+			uint8_t actual_value = 0;
+			generic_result actual_res = get_v_register(test_state, current->v_reg, &actual_value);
+			if(EXPR_EQUAL(actual_res, current->expected_result)){
+				details.sub_checks_passed++;
+			}else{
+				fprintf(stderr, "Expected %d, but was %d instead. Failed at %s:%d. \n", current->expected_result, actual_res, __FILE__, __LINE__);
+				details.sub_checks_failed++;
+				details.passed = false;
+			}
+			if(current->expected_result == SUCCESS){
+				const uint8_t expected_value = (uint8_t) (current->v_reg + 1);
+				if(EXPR_EQUAL(actual_value, expected_value)){
+					details.sub_checks_passed++;
+				}else{
+					fprintf(stderr, "Expected v register %d to be %d, but was %d instead. Failed at %s:%d. \n", current->v_reg, expected_value, actual_value, __FILE__, __LINE__);
+					details.sub_checks_failed++;
+					details.passed = false;
+				}
+			}
+		}
+		free(test_state);
+	}
+	return details;
+}
+
+test_details test_set_vf_to_flag_value(){
+	test_details details = {.name = (char*) __func__, .passed = true, .sub_checks_passed = 0, .sub_checks_failed = 0};
+	for(size_t i = 0; i < sizeof(test_cases_set_vf_to_flag_value) / sizeof(test_case_set_vf_to_flag_value); i++){
+		core_state* test_state = (core_state*) malloc(sizeof(core_state));
+		if(test_state != NULL){
+			for(size_t j = 0; j < NUM_V_REGISTERS; j++){
+				test_state->v_registers[j] = 0xFF;
+			}
+			const test_case_set_vf_to_flag_value* current = &test_cases_set_vf_to_flag_value[i];
+			generic_result actual_res = set_vf_to_flag_value(test_state, current->value);
+			if(EXPR_EQUAL(actual_res, current->expected_result)){
+				details.sub_checks_passed++;
+			}else{
+				fprintf(stderr, "Expected %d, but was %d instead. Failed at %s:%d. \n", current->expected_result, actual_res, __FILE__, __LINE__);
+				details.sub_checks_failed++;
+				details.passed = false;
+			}
+			if(current->expected_result == SUCCESS){
+				if(EXPR_EQUAL(test_state->v_registers[0x0F], (uint8_t) current->value)){
+					details.sub_checks_passed++;
+				}else{
+					fprintf(stderr, "Expected v register VF to be %d, but was %d instead. Failed at %s:%d. \n", (uint8_t) current->value, test_state->v_registers[0x0F], __FILE__, __LINE__);
+					details.sub_checks_failed++;
+					details.passed = false;
+				}
+			}
+		}
+		free(test_state);
+	}
+	return details;
+}
+
+test_details test_set_index_register(){
+	test_details details = {.name = (char*) __func__, .passed = true, .sub_checks_passed = 0, .sub_checks_failed = 0};
+	for(size_t i = 0; i < sizeof(test_cases_set_index_register) / sizeof(test_case_set_index_register); i++){
+		core_state* test_state = (core_state*) malloc(sizeof(core_state));
+		if(test_state != NULL){
+			test_state->index_register = MEMORY_SIZE;
+			const test_case_set_index_register* current = &test_cases_set_index_register[i];
+			generic_result actual_res = set_index_register(test_state, current->memory_address);
+			if(EXPR_EQUAL(actual_res, current->expected_result)){
+				details.sub_checks_passed++;
+			}else{
+				fprintf(stderr, "Expected %d, but was %d instead. Failed at %s:%d. \n", current->expected_result, actual_res, __FILE__, __LINE__);
+				details.sub_checks_failed++;
+				details.passed = false;
+			}
+			if(current->expected_result == SUCCESS){
+				if(EXPR_EQUAL(test_state->index_register, current->memory_address)){
+					details.sub_checks_passed++;
+				}else{
+					fprintf(stderr, "Expected index register to be %d, but was %d instead. Failed at %s:%d. \n", current->memory_address, test_state->index_register, __FILE__, __LINE__);
+					details.sub_checks_failed++;
+					details.passed = false;
+				}
+			}
+		}
+		free(test_state);
+	}
+	return details;
+}
+
+test_details test_get_index_register(){
+	test_details details = {.name = (char*) __func__, .passed = true, .sub_checks_passed = 0, .sub_checks_failed = 0};
+	for(size_t i = 0; i < sizeof(test_cases_get_index_register) / sizeof(test_case_get_index_register); i++){
+		core_state* test_state = (core_state*) malloc(sizeof(core_state));
+		if(test_state != NULL){
+			const test_case_get_index_register* current = &test_cases_get_index_register[i];
+			test_state->index_register = current->current_index_register;
+			uint16_t actual_value = 0;
+			generic_result actual_res = get_index_register(test_state, &actual_value);
+			if(EXPR_EQUAL(actual_res, current->expected_result)){
+				details.sub_checks_passed++;
+			}else{
+				fprintf(stderr, "Expected %d, but was %d instead. Failed at %s:%d. \n", current->expected_result, actual_res, __FILE__, __LINE__);
+				details.sub_checks_failed++;
+				details.passed = false;
+			}
+			if(current->expected_result == SUCCESS){
+				if(EXPR_EQUAL(actual_value, current->current_index_register)){
+					details.sub_checks_passed++;
+				}else{
+					fprintf(stderr, "Expected index register to be %d, but was %d instead. Failed at %s:%d. \n", current->current_index_register, actual_value, __FILE__, __LINE__);
+					details.sub_checks_failed++;
+					details.passed = false;
+				}
+			}
+		}
+		free(test_state);
+	}
+	return details;
+}

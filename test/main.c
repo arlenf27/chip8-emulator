@@ -20,7 +20,12 @@ int main(int argc, char* argv[]){
 			test_increment_pc,
 			test_set_pc,
 			test_push_pc_value_on_stack,
-			test_pop_value_from_stack_to_pc
+			test_pop_value_from_stack_to_pc,
+			test_set_v_register,
+			test_get_v_register,
+			test_set_vf_to_flag_value,
+			test_set_index_register,
+			test_get_index_register
 	};
 	const int num_tests = sizeof(test_functions) / sizeof(test_function);
 	run_tests(test_functions, num_tests);
