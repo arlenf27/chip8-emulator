@@ -47,6 +47,16 @@ void set_vx_to_vx_and_vy(core_state* state, uint8_t v_reg_x, uint8_t v_reg_y, bo
 
 void set_vx_to_vx_xor_vy(core_state* state, uint8_t v_reg_x, uint8_t v_reg_y, bool* success, const char** custom_message);
 
+void add_value_vy_to_vx(core_state* state, uint8_t v_reg_x, uint8_t v_reg_y, bool* success, const char** custom_message);
+
+void subtract_value_vy_from_vx(core_state* state, uint8_t v_reg_x, uint8_t v_reg_y, bool* success, const char** custom_message);
+
+void store_value_vy_shifted_right_one_bit_to_vx(core_state* state, uint8_t v_reg_x, uint8_t v_reg_y, bool* success, const char** custom_message);
+
+void set_vx_to_value_vy_minus_vx(core_state* state, uint8_t v_reg_x, uint8_t v_reg_y, bool* success, const char** custom_message);
+
+void store_value_vy_shifted_left_one_bit_to_vx(core_state* state, uint8_t v_reg_x, uint8_t v_reg_y, bool* success, const char** custom_message);
+
 /*** Public Functions ***/
 
 instruction_result execute_instruction(uint16_t instruction, core_state* state){
@@ -163,31 +173,31 @@ instruction_result execute_instruction(uint16_t instruction, core_state* state){
 				case 0x4:
 				{
 					result.type = ADD_VALUE_VY_TO_VX;
-					/* TODO: Handle ADD_VALUE_VY_TO_VX */
+					add_value_vy_to_vx(state, (uint8_t) digits.hex2, (uint8_t) digits.hex1, &result.success, &result.custom_message);
 					break;
 				}
 				case 0x5:
 				{
 					result.type = SUBTRACT_VALUE_VY_FROM_VX;
-					/* TODO: Handle SUBTRACT_VALUE_VY_FROM_VX */
+					subtract_value_vy_from_vx(state, (uint8_t) digits.hex2, (uint8_t) digits.hex1, &result.success, &result.custom_message);
 					break;
 				}
 				case 0x6:
 				{
 					result.type = STORE_VALUE_VY_SHIFTED_RIGHT_ONE_BIT_TO_VX;
-					/* TODO: Handle STORE_VALUE_VY_SHIFTED_RIGHT_ONE_BIT_TO_VX */
+					store_value_vy_shifted_right_one_bit_to_vx(state, (uint8_t) digits.hex2, (uint8_t) digits.hex1, &result.success, &result.custom_message);
 					break;
 				}
 				case 0x7:
 				{
-					result.type = SET_VX_TO_VALUE_VY_MINUX_VX;
-					/* TODO: Handle SET_VX_TO_VALUE_VY_MINUX_VX */
+					result.type = SET_VX_TO_VALUE_VY_MINUS_VX;
+					set_vx_to_value_vy_minus_vx(state, (uint8_t) digits.hex2, (uint8_t) digits.hex1, &result.success, &result.custom_message);
 					break;
 				}
 				case 0xE:
 				{
 					result.type = STORE_VALUE_VY_SHIFTED_LEFT_ONE_BIT_TO_VX;
-					/* TODO: Handle STORE_VALUE_VY_SHIFTED_LEFT_ONE_BIT_TO_VX */
+					store_value_vy_shifted_left_one_bit_to_vx(state, (uint8_t) digits.hex2, (uint8_t) digits.hex1, &result.success, &result.custom_message);
 					break;
 				}
 				default:
@@ -520,6 +530,124 @@ void set_vx_to_vx_xor_vy(core_state* state, uint8_t v_reg_x, uint8_t v_reg_y, bo
 		if(set_v_register(state, v_reg_x, result) == SUCCESS){
 			*custom_message = "";
 			*success = go_to_next_instruction(state, custom_message);
+		}else{
+			*custom_message = "Setting value of register failed, invalid register. \n";
+			*success = false;
+		}
+	}else{
+		*custom_message = "Getting value of register(s) failed, invalid register(s). \n";
+		*success = false;
+	}
+}
+
+void add_value_vy_to_vx(core_state* state, uint8_t v_reg_x, uint8_t v_reg_y, bool* success, const char** custom_message){
+	uint8_t value_vx = 0, value_vy = 0;
+	if((get_v_register(state, v_reg_x, &value_vx) == SUCCESS) && (get_v_register(state, v_reg_y, &value_vy) == SUCCESS)){
+		/* Unsigned integer addition always results in wrap-around if result is too large. */
+		value_vx = (uint8_t) (value_vx + value_vy);
+		vf_flag_value carry = (value_vx < value_vy) ? VF_CARRY_OCCURS : VF_NO_CARRY;
+		if(set_v_register(state, v_reg_x, value_vx) == SUCCESS){
+			if(set_vf_to_flag_value(state, carry) == SUCCESS){
+				*custom_message = "";
+				*success = go_to_next_instruction(state, custom_message);
+			}else{
+				*custom_message = "Setting value of register VF failed. \n";
+				*success = false;
+			}
+		}else{
+			*custom_message = "Setting value of register failed, invalid register. \n";
+			*success = false;
+		}
+	}else{
+		*custom_message = "Getting value of register(s) failed, invalid register(s). \n";
+		*success = false;
+	}
+}
+
+void subtract_value_vy_from_vx(core_state* state, uint8_t v_reg_x, uint8_t v_reg_y, bool* success, const char** custom_message){
+	uint8_t value_vx = 0, value_vy = 0;
+	if((get_v_register(state, v_reg_x, &value_vx) == SUCCESS) && (get_v_register(state, v_reg_y, &value_vy) == SUCCESS)){
+		/* Unsigned integer subtraction always results in wrap-around if result is too small. */
+		vf_flag_value borrow = (value_vx >= value_vy) ? VF_NO_BORROW : VF_BORROW_OCCURS;
+		value_vx = (uint8_t) (value_vx - value_vy);
+		if(set_v_register(state, v_reg_x, value_vx) == SUCCESS){
+			if(set_vf_to_flag_value(state, borrow) == SUCCESS){
+				*custom_message = "";
+				*success = go_to_next_instruction(state, custom_message);
+			}else{
+				*custom_message = "Setting value of register VF failed. \n";
+				*success = false;
+			}
+		}else{
+			*custom_message = "Setting value of register failed, invalid register. \n";
+			*success = false;
+		}
+	}else{
+		*custom_message = "Getting value of register(s) failed, invalid register(s). \n";
+		*success = false;
+	}
+}
+
+void store_value_vy_shifted_right_one_bit_to_vx(core_state* state, uint8_t v_reg_x, uint8_t v_reg_y, bool* success, const char** custom_message){
+	uint8_t value_vy = 0;
+	if(get_v_register(state, v_reg_y, &value_vy) == SUCCESS){
+		uint8_t result = value_vy >> 1;
+		vf_flag_value least_significant_bit = (value_vy & 0x1) ? VF_LEAST_SIG_BIT_ONE : VF_LEAST_SIG_BIT_ZERO;
+		if(set_v_register(state, v_reg_x, result) == SUCCESS){
+			if(set_vf_to_flag_value(state, least_significant_bit) == SUCCESS){
+				*custom_message = "";
+				*success = go_to_next_instruction(state, custom_message);
+			}else{
+				*custom_message = "Setting value of register VF failed. \n";
+				*success = false;
+			}
+		}else{
+			*custom_message = "Setting value of register failed, invalid register. \n";
+			*success = false;
+		}
+	}else{
+		*custom_message = "Getting value of register(s) failed, invalid register(s). \n";
+		*success = false;
+	}
+}
+
+void set_vx_to_value_vy_minus_vx(core_state* state, uint8_t v_reg_x, uint8_t v_reg_y, bool* success, const char** custom_message){
+	uint8_t value_vx = 0, value_vy = 0;
+	if((get_v_register(state, v_reg_x, &value_vx) == SUCCESS) && (get_v_register(state, v_reg_y, &value_vy) == SUCCESS)){
+		/* Unsigned integer subtraction always results in wrap-around if result is too small. */
+		vf_flag_value borrow = (value_vy >= value_vx) ? VF_NO_BORROW : VF_BORROW_OCCURS;
+		uint8_t result = (uint8_t) (value_vy - value_vx);
+		if(set_v_register(state, v_reg_x, result) == SUCCESS){
+			if(set_vf_to_flag_value(state, borrow) == SUCCESS){
+				*custom_message = "";
+				*success = go_to_next_instruction(state, custom_message);
+			}else{
+				*custom_message = "Setting value of register VF failed. \n";
+				*success = false;
+			}
+		}else{
+			*custom_message = "Setting value of register failed, invalid register. \n";
+			*success = false;
+		}
+	}else{
+		*custom_message = "Getting value of register(s) failed, invalid register(s). \n";
+		*success = false;
+	}
+}
+
+void store_value_vy_shifted_left_one_bit_to_vx(core_state* state, uint8_t v_reg_x, uint8_t v_reg_y, bool* success, const char** custom_message){
+	uint8_t value_vy = 0;
+	if(get_v_register(state, v_reg_y, &value_vy) == SUCCESS){
+		uint8_t result = value_vy << 1;
+		vf_flag_value most_significant_bit = (value_vy & 0x80) ? VF_MOST_SIG_BIT_ONE : VF_MOST_SIG_BIT_ZERO;
+		if(set_v_register(state, v_reg_x, result) == SUCCESS){
+			if(set_vf_to_flag_value(state, most_significant_bit) == SUCCESS){
+				*custom_message = "";
+				*success = go_to_next_instruction(state, custom_message);
+			}else{
+				*custom_message = "Setting value of register VF failed. \n";
+				*success = false;
+			}
 		}else{
 			*custom_message = "Setting value of register failed, invalid register. \n";
 			*success = false;
