@@ -57,6 +57,8 @@ void set_vx_to_value_vy_minus_vx(core_state* state, uint8_t v_reg_x, uint8_t v_r
 
 void store_value_vy_shifted_left_one_bit_to_vx(core_state* state, uint8_t v_reg_x, uint8_t v_reg_y, bool* success, const char** custom_message);
 
+void skip_if_value_vx_not_equal_to_value_vy(core_state* state, uint8_t v_reg_x, uint8_t v_reg_y, bool* success, const char** custom_message);
+
 /*** Public Functions ***/
 
 instruction_result execute_instruction(uint16_t instruction, core_state* state){
@@ -212,7 +214,7 @@ instruction_result execute_instruction(uint16_t instruction, core_state* state){
 		case 0x9:
 		{
 			result.type = SKIP_IF_VALUE_VX_NOT_EQUAL_TO_VALUE_VY;
-			/* TODO: Handle SKIP_IF_VALUE_VX_NOT_EQUAL_TO_VALUE_VY */
+			skip_if_value_vx_not_equal_to_value_vy(state, (uint8_t) digits.hex2, (uint8_t) digits.hex1, &result.success, &result.custom_message);
 			break;
 		}
 		case 0xA:
@@ -651,6 +653,25 @@ void store_value_vy_shifted_left_one_bit_to_vx(core_state* state, uint8_t v_reg_
 		}else{
 			*custom_message = "Setting value of register failed, invalid register. \n";
 			*success = false;
+		}
+	}else{
+		*custom_message = "Getting value of register(s) failed, invalid register(s). \n";
+		*success = false;
+	}
+}
+
+void skip_if_value_vx_not_equal_to_value_vy(core_state* state, uint8_t v_reg_x, uint8_t v_reg_y, bool* success, const char** custom_message){
+	uint8_t value_vx = 0, value_vy = 0;
+	if((get_v_register(state, v_reg_x, &value_vx) == SUCCESS) && (get_v_register(state, v_reg_y, &value_vy) == SUCCESS)){
+		if(value_vx != value_vy){
+			*custom_message = "Value VX not equal to value VY, skipping. \n";
+			*success = go_to_next_instruction(state, custom_message);
+		}else{
+			*custom_message = "Value VX equals value VY, not skipping. \n";
+			*success = true;
+		}
+		if(*success){
+			*success = go_to_next_instruction(state, custom_message);
 		}
 	}else{
 		*custom_message = "Getting value of register(s) failed, invalid register(s). \n";
