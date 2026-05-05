@@ -1,8 +1,4 @@
 # CHIP-8 Emulator
-## Status
-In progress: 
-- Core State and Core Instruction Handling in Development
-- Test Infrastructure and Unit Tests in Development
 
 ## Introduction
 Chip-8 is an interpreted programming language originally designed for use on the RCA COSMAC VIP computer in the 1970's by Joseph Weisbecker. The thirty-one hexadecimal instructions on the original Chip-8 instruction set provide functionalities for video/sound output, user input, and data manipulation. 
